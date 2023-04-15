@@ -5,7 +5,7 @@ from math import log
 def my_dct(matrix, N) :
     height, lenght = matrix.shape  #number rows, number columns
     pad_l = lenght - ((lenght % N - N) if lenght%N != 0 else 0)
-    block_list = matrix_to_blocks(matrix, N, height, lenght)
+    block_list = matrix_to_blocks(np.float32(matrix), N, height, lenght)
     
     #Applying the dct transformation per block
     dct_block_list = []
@@ -20,15 +20,14 @@ def my_dct(matrix, N) :
 def my_idct(matrix, N) :
     height, lenght = matrix.shape  #number rows, number columns
     pad_l = lenght - ((lenght % N - N) if lenght%N != 0 else 0)
-    block_list = matrix_to_blocks(matrix, N, height, lenght) 
+    block_list = matrix_to_blocks(np.float32(matrix), N, height, lenght) 
     
     #Applying the dct INVERTED transformation per block
     idct_block_list = []
     for mtrx in block_list : 
         idct_block_list.append(cv2.idct(mtrx))
 
-    #Building back the whole matrix, but returned the 8 bit unsigned integer version so the matrix
-    #can be immediatly used
+    #Building back the whole matrix, but returned the 8 bit unsigned integer version so the matrix can be immediatly used
     return np.uint8(blocks_to_matrix(idct_block_list, height, lenght, pad_l, N))
 
 
@@ -62,18 +61,17 @@ def matrix_to_blocks(matrix, N, h, l) :
 
 def padding(matrix, N, h, l) :
     Nbased_mtrx = np.pad(matrix, pad_width = ((0, (N - h % N) if h%N != 0 else 0), (0, (N - l % N) if l%N != 0 else 0)), mode = 'edge')
-    print(Nbased_mtrx)
     return Nbased_mtrx
 
 
-#Calcola l'MSE tra la componente originale e la componente "compressa" 
+
 def MSE (og_mtrx, compressed_mtrx) :
     height, lenght = og_mtrx.shape
-    sque = 0
+    sque = np.float64(0)
     for i in range(0, height) :
         for j in range(0, lenght) :
-            sque +=  (compressed_mtrx[i][j] - og_mtrx[i][j])**2
-    return sque / ((height * lenght))
+            sque += (int(compressed_mtrx[i][j]) - int(og_mtrx[i][j]))**2
+    return sque / (height * lenght)
 
 
 

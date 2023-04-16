@@ -1,9 +1,10 @@
 import cv2
 import utilities as u 
 import numpy as np
+import padder as pd
 
-N = 4
-test_faded_d_errors = np.array([
+#8x8
+test_1= np.array([
     [255, 140, 216, 198, 180, 162, 144, 126],
     [234, 216, 198, 180, 165, 144, 126, 108],
     [216, 198, 170, 162, 144, 126, 108, 90],
@@ -11,16 +12,33 @@ test_faded_d_errors = np.array([
     [180, 158, 144, 100, 108, 90, 72, 54],
     [162, 144, 126, 108, 90, 72, 54, 18],
     [144, 126, 108, 88, 72, 54, 0, 18],
-    [126, 108, 90, 72, 54, 36, 18, 0,]
-    ])
+    [126, 108, 90, 72, 54, 36, 18, 0]
+])
 
-scale = 50
-#cv2.imshow('og', np.uint8(u.scale(test_faded_d_errors, scale)))
-sus = u.my_dct(test_faded_d_errors, N)
-#cv2.imshow('new', np.uint8(u.scale(sus, scale)))
-sus_final = u.my_idct(sus, N)
-print(sus_final)
+#7x9
+test_2 = np.array([
+    [0,0,0,0,0,0,0,0,4],
+    [1,1,1,1,1,1,1,1,4],
+    [2,2,2,2,2,2,2,2,4],
+    [0,0,0,0,0,0,0,0,4],
+    [1,1,1,1,1,1,1,1,4],
+    [2,2,2,2,2,2,2,2,4],
+    [0,0,0,0,0,0,0,0,4]
+])
 
-m = u.MSE(test_faded_d_errors, sus_final)
-print(m)
-#cv2.imshow('new', np.uint8(u.scale(sus_final, scale)))
+#5x5
+test_3 = np.array([
+    [0,0,0,0,7],
+    [1,1,1,1,7],
+    [2,2,2,2,7],
+    [0,0,0,0,7],
+    [1,1,1,1,7],
+])
+
+test = test_1
+N = 6
+bl = pd.matrix_to_blocks(test, N, test.shape[0], test.shape[1])
+print(bl)
+
+print("REBUILT")
+print(pd.blocks_to_matrix(bl, N, test.shape[0], test.shape[1]))

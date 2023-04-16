@@ -1,25 +1,23 @@
 import numpy as np
 import cv2 
-from math import log
+import math
 
 def my_dct(matrix, N) :
     height, lenght = matrix.shape  #number rows, number columns
-    pad_l = lenght - ((lenght % N - N) if lenght%N != 0 else 0)
     block_list = matrix_to_blocks(np.float32(matrix), N, height, lenght)
     
     #Applying the dct transformation per block
     dct_block_list = []
-    for mtrx in block_list : 
-        dct_block_list.append(cv2.dct(mtrx))
+    for elem in block_list : 
+        dct_block_list.append(cv2.dct(elem))
 
     #Building back the whole matrix
-    return blocks_to_matrix(dct_block_list, height, lenght, pad_l, N)
+    return blocks_to_matrix(dct_block_list, N, height, lenght)
 
 
 
 def my_idct(matrix, N) :
     height, lenght = matrix.shape  #number rows, number columns
-    pad_l = lenght - ((lenght % N - N) if lenght%N != 0 else 0)
     block_list = matrix_to_blocks(np.float32(matrix), N, height, lenght) 
     
     #Applying the dct INVERTED transformation per block
@@ -28,17 +26,7 @@ def my_idct(matrix, N) :
         idct_block_list.append(cv2.idct(mtrx))
 
     #Building back the whole matrix, but returned the 8 bit unsigned integer version so the matrix can be immediatly used
-    return np.uint8(blocks_to_matrix(idct_block_list, height, lenght, pad_l, N))
-
-
-
-def blocks_to_matrix(blocklist, mtrx_h, mtrx_l, pad_l, N) : 
-    build_mtrx = np.zeros((mtrx_h, mtrx_l))
-    for i in range(0, mtrx_h) :
-        for j in range(0, mtrx_l) : 
-            build_mtrx[i][j] = blocklist[int((i - i%N) / N) * int(pad_l/N) + int((j - j%N) / N)][i%N][j%N]
-
-    return build_mtrx
+    return np.uint8(np.round(blocks_to_matrix(idct_block_list, N, height, lenght)))
 
 
 
@@ -47,21 +35,37 @@ def matrix_to_blocks(matrix, N, h, l) :
     new_h, new_l = fix_mtrx.shape
     block_list = []
 
-    for row_block in  range(0, int(new_h/N)) :
-        for col_block in range(0, int(new_l/N)) : 
-            block = np.zeros((N, N))
-            for i in range(0,N) :
-                for j in range(0,N) : 
-                    block[i][j] = fix_mtrx[row_block*N + i][col_block*N + j] #LOOK FOR POSSIBLE ONE LINE COMMAND
-            block_list.append(block)
+    for row_block in  range(0, math.ceil(new_h/N)) :
+        for col_block in range(0, math.ceil(new_l/N)) : 
+                
+                col_indx = np.minimum(new_l - col_block*N, N)
+                row_indx = np.minimum(new_h - row_block*N, N)
+
+                block = np.zeros((row_indx, col_indx))
+                for i in range(row_indx) :
+                    for j in range(col_indx) : 
+                        block[i][j] = fix_mtrx[row_block*N + i][col_block*N + j] 
+                block_list.append(block)
 
     return block_list
 
 
 
-def padding(matrix, N, h, l) :
-    Nbased_mtrx = np.pad(matrix, pad_width = ((0, (N - h % N) if h%N != 0 else 0), (0, (N - l % N) if l%N != 0 else 0)), mode = 'edge')
-    return Nbased_mtrx
+def blocks_to_matrix(blocklist, N, mtrx_h, mtrx_l) : 
+    build_mtrx = np.zeros((mtrx_h, mtrx_l), np.float32)
+    numblock_in_row = math.ceil(mtrx_l / N)
+    
+    for i in range(0, mtrx_h) :
+        for j in range(0, mtrx_l) : 
+            build_mtrx[i][j] = blocklist[math.floor(i / N) * numblock_in_row + math.floor(j / N)][i%N][j%N]
+                         
+    return build_mtrx
+
+
+def padding(matrix, N, h, l) : 
+    row_rem = h % N
+    col_rem = l % N
+    return np.pad(matrix, pad_width = ((0, 0 if row_rem % 2 == 0 else 1), (0, 0 if col_rem % 2 == 0 else 1)), mode = 'edge')
 
 
 
@@ -78,7 +82,8 @@ def MSE (og_mtrx, compressed_mtrx) :
 def MSE_P(MSE_Y, MSE_Cb, MSE_Cr) : return 0.75*MSE_Y + 0.125*MSE_Cb + 0.125*MSE_Cr
 
 
-def PNSR(MSE_P) : return 10 * log((255**2 / MSE_P), 10)
+
+def PNSR(MSE_P) : return (10 * math.log((255**2 / MSE_P), 10)) if MSE_P != 0 else 0
 
 
 

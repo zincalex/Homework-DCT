@@ -68,6 +68,15 @@ def padding(matrix, N, h, l) :
     return np.pad(matrix, pad_width = ((0, 0 if row_rem % 2 == 0 else 1), (0, 0 if col_rem % 2 == 0 else 1)), mode = 'edge')
 
 
+def percentage_loss (dct_mtrx, R) :
+    value = np.percentile(np.abs(dct_mtrx), R) #search the value for which %R in np.abs(dct_mtrx) are lower than this value returned
+    mtrx_cmprsd = np.copy(dct_mtrx)
+
+    #The elements in the matrix lower than value are setted to 0
+    mtrx_cmprsd[ np.abs(mtrx_cmprsd) <= value ] = 0 #inline condition 
+
+    return mtrx_cmprsd
+
 
 def MSE (og_mtrx, compressed_mtrx) :
     height, lenght = og_mtrx.shape
@@ -83,7 +92,38 @@ def MSE_P(MSE_Y, MSE_Cb, MSE_Cr) : return 0.75*MSE_Y + 0.125*MSE_Cb + 0.125*MSE_
 
 
 
-def PNSR(MSE_P) : return (10 * math.log((255**2 / MSE_P), 10)) if MSE_P != 0 else 0
+def PNSR(MSE_P) : return (10 * math.log((255**2 / MSE_P), 10)) if MSE_P != 0 else float('inf')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

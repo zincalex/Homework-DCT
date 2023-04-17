@@ -37,8 +37,7 @@ test_3 = np.array([
 
 test = test_1
 N = 6
-bl = pd.matrix_to_blocks(test, N, test.shape[0], test.shape[1])
-print(bl)
+R = 100
 
-print("REBUILT")
-print(pd.blocks_to_matrix(bl, N, test.shape[0], test.shape[1]))
+mrt = u.my_dct(test, N)
+u.percentage_loss(mrt, R)

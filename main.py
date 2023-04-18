@@ -2,12 +2,14 @@ import sys
 import random
 import cv2 
 import numpy as np
+import matplotlib.pyplot as plt
 import utilities as u
+
 
 def main() :
     #img_file = sys.arg[1]
     R = random.randint(1,100) #range [1,100]
-    N = 128
+    N = 8
     sus = "img_test4.jpg"
     imgBGR = cv2.imread("image input/" + sus)
 
@@ -43,7 +45,8 @@ def main() :
         imgYCrCb_rebuilt = cv2.merge([Y_rebuilt, Cr_rebuilt, Cb_rebuilt])
         out = cv2.cvtColor(imgYCrCb_rebuilt, cv2.COLOR_YCrCb2BGR)
         file_name = str(R) + '.jpg'
-        cv2.imwrite(file_name, out) 
+
+        cv2.imwrite(file_name, out) #save the image
         
 
         MSE_Y = u.MSE(Y, Y_rebuilt)
@@ -52,6 +55,7 @@ def main() :
         MSE_P = u.MSE_P(MSE_Y, MSE_Cb, MSE_Cr)
         PSNR = u.PNSR(MSE_P)
 
+        """
         print(R)
         print(MSE_Y)
         print(MSE_Cb)
@@ -59,25 +63,21 @@ def main() :
         print(MSE_P)
         print(PSNR)
         print("NEXT \n")
+        """
         
         if not first : 
             R_values.append(R)
             PSNR_values.append(PSNR)
-            R += 10
+            R += 1
         else : 
-            R = 10
+            R = 90
             first = False
 
-        
-        
-        #cv2.imshow('Cb rebuilt', Cb_rebuilt) 
-        #cv2.imshow('Cr rebuilt', Cr_rebuilt) 
-        
+    
 
-        #SAVE THE IMAGES
-       
-        #cv2.imwrite('onlyCb_as_bgr.png', onlyCb_as_bgr) 
-        #cv2.imwrite('onlyCr_as_bgr.png', onlyCr_as_bgr)
+    plt.plot(R_values, PSNR_values, marker = 'o', color = 'blue')
+    plt.show()   
+
 
 
 if __name__ == "__main__" :

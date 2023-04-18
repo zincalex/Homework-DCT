@@ -25,8 +25,17 @@ def my_idct(matrix, N) :
     for mtrx in block_list : 
         idct_block_list.append(cv2.idct(mtrx))
 
+    idct_mtrx = np.round(blocks_to_matrix(idct_block_list, N, height, lenght))
+    #ZANZI DISCOVERY : SOME VALUE WHERE HIGHER THAN 255 OR LESS THAN 0, RESULTING THE CONVERSATION IN INT8 TO BROKE SOME IMAGE PART
+    for i in range(height) : 
+        for j in range(lenght) : 
+            if idct_mtrx[i][j] > 255 : idct_mtrx[i][j] = 255
+            if idct_mtrx[i][j] <  0 : idct_mtrx[i][j] = 0
+
+    print("---------------------------------\n")     
+    print(np.uint8(idct_mtrx))
     #Building back the whole matrix, but returned the 8 bit unsigned integer version so the matrix can be immediatly used
-    return np.uint8(np.round(blocks_to_matrix(idct_block_list, N, height, lenght)))
+    return np.uint8(idct_mtrx)
 
 
 

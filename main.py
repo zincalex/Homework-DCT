@@ -2,17 +2,15 @@ import sys
 import cv2 
 import utilities as u
 
-
-
 def main() :
     #taking from command line the img and the block size N
     img_file = sys.argv[1]
     N = int(sys.argv[2])
     imgBGR = cv2.imread("image input/" + img_file)
 
-    R = 10
+    R = 95
     R_LIMIT = 100
-    
+
     #OpenCV show the image based on the BGR convention. In order to make things simpler to read, we procede 
     #converting BGR to RGB; once we want to show the image remember to convert it back
     imgRGB = cv2.cvtColor(imgBGR, cv2.COLOR_BGR2RGB)
@@ -41,9 +39,9 @@ def main() :
         
 
         #IF YOU LIKE TO SAVE THE FINAL IMAGE REBUILT, JUST UNCOMMENT THIS SECTION
-        #imgYCrCb_rebuilt = cv2.merge([Y_rebuilt, Cr_rebuilt, Cb_rebuilt])
-        #out_img = cv2.cvtColor(imgYCrCb_rebuilt, cv2.COLOR_YCrCb2BGR)
-        #cv2.imwrite("Output image/" + str(R) + " compression rate.jpg", out_img) 
+        imgYCrCb_rebuilt = cv2.merge([Y_rebuilt, Cr_rebuilt, Cb_rebuilt])
+        out_img = cv2.cvtColor(imgYCrCb_rebuilt, cv2.COLOR_YCrCb2BGR)
+        cv2.imwrite("Output image/" + str(R) + " compression rate.jpg", out_img) 
         
         MSE_Y = u.MSE(Y, Y_rebuilt)
         MSE_Cb = u.MSE(Cb, Cb_rebuilt)
@@ -53,7 +51,7 @@ def main() :
         
         R_values.append(R)
         PSNR_values.append(PSNR)
-        R += 10
+        R += 1
     
     u.PSNR_plot(R_values, PSNR_values, img_file, N)
 

@@ -1,30 +1,28 @@
 import sys
-import random
 import cv2 
-import numpy as np
-import matplotlib.pyplot as plt
 import utilities as u
 
 
-def main() :
-    #img_file = sys.arg[1]
-    R = random.randint(1,100) #range [1,100]
-    N = 8
-    sus = "img_test6.jpg"
-    imgBGR = cv2.imread("image input/" + sus)
 
+def main() :
+    #taking from command line the img and the block size N
+    img_file = sys.argv[1]
+    N = int(sys.argv[2])
+    imgBGR = cv2.imread("image input/" + img_file)
+
+    R = 10
+    R_LIMIT = 100
+    
     #OpenCV show the image based on the BGR convention. In order to make things simpler to read, we procede 
     #converting BGR to RGB; once we want to show the image remember to convert it back
     imgRGB = cv2.cvtColor(imgBGR, cv2.COLOR_BGR2RGB)
     imgYCrCb = cv2.cvtColor(imgRGB, cv2.COLOR_RGB2YCrCb) 
     Y, Cr, Cb = cv2.split(imgYCrCb)
     
-    first = True
     PSNR_values = []
     R_values = []
 
-    while R <= 100 :
-
+    while R <= R_LIMIT :
         Y_dct = u.my_dct(Y, N)
         Cr_dct = u.my_dct(Cr, N)
         Cb_dct = u.my_dct(Cb,N)
@@ -42,30 +40,22 @@ def main() :
         Cb_rebuilt = u.my_idct(Cb_dct_comp, N)
         
 
-        imgYCrCb_rebuilt = cv2.merge([Y_rebuilt, Cr_rebuilt, Cb_rebuilt])
-        out = cv2.cvtColor(imgYCrCb_rebuilt, cv2.COLOR_YCrCb2BGR)
-        file_name = str(R) + '.jpg'
-
-        cv2.imwrite(file_name, out) #save the image
+        #IF YOU LIKE TO SAVE THE FINAL IMAGE REBUILT, JUST UNCOMMENT THIS SECTION
+        #imgYCrCb_rebuilt = cv2.merge([Y_rebuilt, Cr_rebuilt, Cb_rebuilt])
+        #out_img = cv2.cvtColor(imgYCrCb_rebuilt, cv2.COLOR_YCrCb2BGR)
+        #cv2.imwrite("Output image/" + str(R) + " compression rate.jpg", out_img) 
         
-
         MSE_Y = u.MSE(Y, Y_rebuilt)
         MSE_Cb = u.MSE(Cb, Cb_rebuilt)
         MSE_Cr = u.MSE(Cr, Cr_rebuilt)
         MSE_P = u.MSE_P(MSE_Y, MSE_Cb, MSE_Cr)
         PSNR = u.PNSR(MSE_P)
         
-        if not first : 
-            R_values.append(R)
-            PSNR_values.append(PSNR)
-            R += 10
-        else : 
-            R = 10
-            first = False
-
-
-    plt.plot(R_values, PSNR_values, marker = 'o', color = 'blue')
-    plt.show()   
+        R_values.append(R)
+        PSNR_values.append(PSNR)
+        R += 10
+    
+    u.PSNR_plot(R_values, PSNR_values, img_file, N)
 
 if __name__ == "__main__" :
     main()

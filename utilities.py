@@ -1,6 +1,7 @@
 import numpy as np
 import cv2 
 import math
+import matplotlib.pyplot as plt
 
 def my_dct(matrix, N) :
     height, lenght = matrix.shape  #number rows, number columns
@@ -79,12 +80,12 @@ def padding(matrix, N, h, l) :
 
 def percentage_loss (dct_mtrx, R) :
     value = np.percentile(np.abs(dct_mtrx), R) #search the value for which %R in np.abs(dct_mtrx) are lower than this value returned
-    mtrx_cmprsd = np.copy(dct_mtrx)
+    mtrx_comp = np.copy(dct_mtrx)
 
-    #The elements in the matrix lower than value are setted to 0
-    mtrx_cmprsd[ np.abs(mtrx_cmprsd) <= value ] = 0 #inline condition 
+    #The elements in the matrix lower than value are set to 0
+    mtrx_comp[ np.abs(mtrx_comp) <= value ] = 0 #inline condition 
 
-    return mtrx_cmprsd
+    return mtrx_comp
 
 
 def MSE (og_mtrx, compressed_mtrx) :
@@ -101,7 +102,24 @@ def MSE_P(MSE_Y, MSE_Cb, MSE_Cr) : return 0.75*MSE_Y + 0.125*MSE_Cb + 0.125*MSE_
 
 
 
-def PNSR(MSE_P) : return (10 * math.log((255**2 / MSE_P), 10)) if MSE_P != 0 else float('inf')
+def PNSR(MSE_P) : return (10 * math.log((255**2 / MSE_P), 10)) if MSE_P != 0 else np.inf
+
+
+
+def PSNR_plot(R_values, PSNR_values, img_file, N) :
+    plot = plt.figure()
+    
+    plt.title(img_file + " " + str(N) + "x" + str(N) + " blocks")
+    plt.yscale("linear")
+    plt.xlabel("R")
+    plt.xticks(R_values)
+    plt.ylabel("PSNR")
+    plt.plot(R_values, PSNR_values, c = 'green')
+    plt.grid()
+    plt.show()
+
+    name_img = img_file.split('.')[0]
+    plot.savefig("Plot image/Plot " + name_img + " " + str(N) + " blocks.jpg", bbox_inches = 'tight') 
 
 
 
@@ -112,38 +130,3 @@ def PNSR(MSE_P) : return (10 * math.log((255**2 / MSE_P), 10)) if MSE_P != 0 els
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#TODO REMEMBER TO DELETE THIS METHOD, JUST FOR TESTING PURPOSE
-def scale(matrix, mult):
-    height, width = matrix.shape
-    ret = np.zeros((height*mult, width*mult))
-    for i in range(0, height):
-        for j in range(0, width):
-            for k in range(0, mult):
-                for c in range(0,mult):
-                    ret[i*mult+k][j*mult+c] = matrix[i][j]
-
-    return ret

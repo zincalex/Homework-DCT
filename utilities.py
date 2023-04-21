@@ -196,7 +196,7 @@ def PNSR(MSE_P) : return (10 * math.log((255**2 / MSE_P), 10)) if MSE_P != 0 els
 
 
 
-def PSNR_plot(R_values, PSNR_values, img_file, N) :
+def PSNR_plot(R_values, PSNR_values, img_name, N) :
     """
     Simple function to save a PSNR plot in the ./Plot image folder
 
@@ -210,17 +210,17 @@ def PSNR_plot(R_values, PSNR_values, img_file, N) :
     """
     plot = plt.figure()
     
-    plt.title(img_file + " " + str(N) + "x" + str(N) + " blocks")
+    plt.title(img_name + ".jpg " + str(N) + "x" + str(N) + " blocks")
     plt.yscale("linear")
     plt.xlabel("R")
     plt.xticks(R_values)
+    plt.xlim([0, 100])
     plt.ylabel("PSNR")
-    plt.plot(R_values, PSNR_values, c = 'green')
+    plt.plot(R_values, PSNR_values, c = 'red')
     plt.grid()
     #plt.show()
 
-    name_img = img_file.split('.')[0]
-    plot.savefig("Plot image/Plot " + name_img + " " + str(N) + " blocks.jpg", bbox_inches = 'tight') 
+    plot.savefig("Plot image/Plot " + img_name + " " + str(N) + " blocks.jpg", bbox_inches = 'tight') 
 
 
 

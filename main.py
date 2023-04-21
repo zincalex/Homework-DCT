@@ -10,7 +10,7 @@ def main() :
     #img_file = sys.arg[1]
     R = random.randint(1,100) #range [1,100]
     N = 8
-    sus = "img_test4.jpg"
+    sus = "img_test6.jpg"
     imgBGR = cv2.imread("image input/" + sus)
 
     #OpenCV show the image based on the BGR convention. In order to make things simpler to read, we procede 
@@ -54,31 +54,18 @@ def main() :
         MSE_Cr = u.MSE(Cr, Cr_rebuilt)
         MSE_P = u.MSE_P(MSE_Y, MSE_Cb, MSE_Cr)
         PSNR = u.PNSR(MSE_P)
-
-        """
-        print(R)
-        print(MSE_Y)
-        print(MSE_Cb)
-        print(MSE_Cr)
-        print(MSE_P)
-        print(PSNR)
-        print("NEXT \n")
-        """
         
         if not first : 
             R_values.append(R)
             PSNR_values.append(PSNR)
-            R += 1
+            R += 10
         else : 
-            R = 90
+            R = 10
             first = False
 
-    
 
     plt.plot(R_values, PSNR_values, marker = 'o', color = 'blue')
     plt.show()   
-
-
 
 if __name__ == "__main__" :
     main()

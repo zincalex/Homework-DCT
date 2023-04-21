@@ -36,9 +36,17 @@ test_3 = np.array([
 ])
 
 test = test_1
-N = 8
-R = 98
+N = 4
+R = 90
 
+print(test)
+print("-------------")
 mrt = u.my_dct(test, N)
+print(mrt)
+print("--------------------")
+mr = u.percentage_loss(mrt, R)
+print(mr)
+print("--------------------")
+mrt2 = u.my_idct(mr, N)
 
-mrt2 = u.my_idct(u.percentage_loss(mrt, R), N)
+print(mrt2)

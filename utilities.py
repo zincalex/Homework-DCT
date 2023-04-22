@@ -208,18 +208,16 @@ def PSNR_plot(R_values, PSNR_values, img_name, N) :
     Returns:
         None
     """
-    plot = plt.figure()
     
+    plot = plt.figure()
     plt.title(img_name + ".jpg " + str(N) + "x" + str(N) + " blocks")
     plt.yscale("linear")
     plt.xlabel("R")
-    plt.xticks(R_values)
-    plt.xlim([0, 100])
     plt.ylabel("PSNR")
+    plt.xticks(R_values)
+    plt.xlim([0, 101])
     plt.plot(R_values, PSNR_values, c = 'red')
     plt.grid()
-    #plt.show()
-
     plot.savefig("Plot image/Plot " + img_name + " " + str(N) + " blocks.jpg", bbox_inches = 'tight') 
 
 
